@@ -8,7 +8,7 @@ P = ap.ArgumentParser(description='Perform frequency sweep to measure '
                       formatter_class=ap.ArgumentDefaultsHelpFormatter)
 P.add_argument('voltage', type=float,
                help='Power supply voltage setting used for motor drive.')
-P.add_argument('motor', choices=['JQ24-35F580C'],
+P.add_argument('--motor', choices=['JQ24-35F580C'], default='JQ24-35F580C',
                help='Type of motor used for vibration.')
 P.add_argument('--motor-range', type=float, nargs=2, default=[0,100],
                help='Min and max of range of motor voltages to apply. Both '
