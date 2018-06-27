@@ -8,9 +8,10 @@ apt-get install -y python-dev python-rpi.gpio python3-dev python3-rpi.gpio  # GP
 apt-get install -y git                                        # git
 apt-get install -y avahi-daemon                               # mDNS
 apt-get install -y emacs ipython python3-ipython              # in case of desperation
+apt-get install -y numpy scipy matplotlib
 
-git clone http://github.com/adamanderson/python_tb6612fng
-git clone http://github.com/adamanderson/python_mma8451
+git clone http://github.com/adamanderson/python_tb6612fng /home/pi
+git clone http://github.com/adamanderson/python_mma8451 /home/pi
 
 touch /boot/ssh                                 # enable ssh https://www.raspberrypi.org/documentation/remote-access/ssh/
 
