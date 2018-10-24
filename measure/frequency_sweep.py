@@ -35,8 +35,11 @@ daq = MMA8451DAQ()
 
 motor.output_on(0)
 for motor_range in motor_ranges:
+    print('Setting motor to {}%.'.format(motor_range))
+
     # set motor controller range
     motor.set_pwm(motor_range)
-    
+
     # take data for a specified duration
+    daq = MMA8451DAQ()
     daq.run(args.duration)
