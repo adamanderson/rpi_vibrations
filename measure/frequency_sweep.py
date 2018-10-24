@@ -31,7 +31,6 @@ if args.motor_range[0] > args.motor_range[1]:
 motor_ranges = np.linspace(args.motor_range[0], args.motor_range[1], args.n_voltages)
 
 motor = TB6612FNG()
-daq = MMA8451DAQ()
 
 motor.output_on(0)
 for motor_range in motor_ranges:
@@ -41,5 +40,5 @@ for motor_range in motor_ranges:
     motor.set_pwm(motor_range)
 
     # take data for a specified duration
-    daq = MMA8451DAQ()
+    daq = MMA8451DAQ('motor={:.1f}'.format(motor_range))
     daq.run(args.duration)
