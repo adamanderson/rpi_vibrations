@@ -8,7 +8,8 @@ apt-get install -y python-dev python-rpi.gpio python3-dev python3-rpi.gpio  # GP
 apt-get install -y git                                        # git
 apt-get install -y avahi-daemon                               # mDNS
 apt-get install -y emacs ipython python3-ipython              # in case of desperation
-apt-get install -y numpy scipy matplotlib
+apt-get install -y python-numpy python-scipy python-matplotlib
+apt-get install -y python3-numpy python3-scipy python3-matplotlib
 
 git clone http://github.com/adamanderson/python_tb6612fng /home/pi
 git clone http://github.com/adamanderson/python_mma8451 /home/pi
