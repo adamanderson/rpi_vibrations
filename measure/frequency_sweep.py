@@ -2,6 +2,8 @@ import argparse as ap
 import numpy as np
 from python_tb6612fng.TB6612FNG import TB6612FNG
 from python_mma8451.record_accelerometer import MMA8451DAQ
+import pickle
+from datetime import datetime
 
 P = ap.ArgumentParser(description='Perform frequency sweep to measure '
                       'mechanical transfer function.',
@@ -28,17 +30,25 @@ if args.motor_range[0] > args.motor_range[1]:
     raise ValueError('Upper end of `--motor-range` arugment is less than '
                      'lower end.')
 
+# housekeeping data
+hkdata = {}
+
 motor_ranges = np.linspace(args.motor_range[0], args.motor_range[1], args.n_voltages)
-
 motor = TB6612FNG()
-
 motor.output_on(0)
+
 for motor_range in motor_ranges:
     print('Setting motor to {}%.'.format(motor_range))
 
     # set motor controller range
     motor.set_pwm(motor_range)
 
-    # take data for a specified duration
+    # save housekeeping data
     daq = MMA8451DAQ('motor={:.1f}'.format(motor_range))
+    hkdata[motor_range] = {'voltage': voltage * (motor_range / 100.),
+                           'file': daq.fname}
+    with open(datetime.utcnow().strftime('%Y%m%d_%H%M%S_sweep_housekeeping.pkl'), 'w') as f:
+        pickle.dump(hkdata, f)
+    
+    # take data for a specified duration
     daq.run(args.duration)
