@@ -73,25 +73,26 @@ def find_psd_peaks(data, fs, freq_range=None, averaging=False, plot=False,
         psd_peak = psd[indmax]
     elif type(freq_range) is list:
         ind_freq_range = (freq > freq_range[0]) & (freq < freq_range[1])
-        if averaging == False:
-            indmax = np.argmax(psd[ind_freq_range])
-            freq_peak = freq[ind_freq_range][indmax]
-            psd_peak = psd[ind_freq_range][indmax]
-        else:
+        indmax = np.argmax(psd[ind_freq_range])
+        freq_peak = freq[ind_freq_range][indmax]
+        psd_peak = psd[ind_freq_range][indmax]
+
+        if averaging:
             freq_peak = freq_range
-            psd_peak = quad(finterp, freq_range[0], freq_range[1])
+            psd_peak = quad(finterp, psd_peak-0.4, psd_peak+0.4)
     elif type(freq_range) is float:
         freq_peak = freq_range
         psd_peak = finterp(freq_range)
 
     if plot:
         plt.figure()
-        print('plotting...')
         plt.semilogy(freq, psd, linewidth=0.5)
         yl = plt.gca().get_ylim()
         plt.plot([freq_peak, freq_peak], yl, 'r--', linewidth=0.5)
         plt.savefig(plot_filename, dpi=150)
         print(plot_filename)
+        plt.xlim([freq_peak-2.0, freq_peak+2.0])
+        plt.savefig('zoom_{}'.format(plot_filename), dpi=150)
         plt.close()
     
     return freq_peak, psd_peak
@@ -169,8 +170,7 @@ def plot_tf(psd_filename):
     with open(psd_filename, 'rb') as f:
         psd_data = pickle.load(f)
 
-    print(psd_data)
-
+    plt.figure()
     for axis in ['x', 'y', 'z']:
         freq = np.array([psd_data[voltage][axis]['freq']
                          for voltage in psd_data])
@@ -185,7 +185,24 @@ def plot_tf(psd_filename):
     plt.ylabel('acceleration PSD [g^2 / Hz]')
     plt.tight_layout()
     plt.savefig('transferfunction.png', dpi=200)
-    
+    plt.close()
+
+    plt.figure()
+    for axis in ['x', 'y', 'z']:
+        freq = np.array([psd_data[voltage][axis]['freq']
+                         for voltage in psd_data])
+        psd = np.array([psd_data[voltage][axis]['psd']
+                         for voltage in psd_data])
+        indsort = np.argsort(freq)
+        freq = freq[indsort]
+        psd = psd[indsort]
+        plt.plot(freq, psd / (freq**2.0), label='{} axis'.format(axis)) 
+    plt.legend()
+    plt.xlabel('frequency [Hz]')
+    plt.ylabel('transfer function (unnormalized)')
+    plt.tight_layout()
+    plt.savefig('transferfunction_corrected.png', dpi=200)
+    plt.close()
 
 if __name__ == '__main__':
     P0 = ap.ArgumentParser(description='Analyze frequency sweep data.',
