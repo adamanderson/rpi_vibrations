@@ -37,6 +37,11 @@ motor_ranges = np.linspace(args.motor_range[0], args.motor_range[1], args.n_volt
 motor = TB6612FNG()
 motor.output_on(0)
 
+# take background measurment with motors off
+if 0.0 not in motor_ranges:
+    motor_ranges = np.insert(motor_ranges, 0, 0)
+
+# actually take the data
 for motor_range in motor_ranges:
     print('Setting motor to {}%.'.format(motor_range))
 
