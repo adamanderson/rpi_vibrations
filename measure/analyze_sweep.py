@@ -25,7 +25,7 @@ def motor_freq(voltage):
     return 33.96 * (voltage**0.44) - 24.14
 
 
-def find_psd_peaks(data, fs, freq_range=None, averaging=False, plot=False,
+def find_psd_peaks(data, fs, freq_range=None, averaging_range=None, plot=False,
                    plot_filename='psd_peak.png'):
     '''
     Calculate the PSD of data at peaks in the PSD. Several schemes for doing
@@ -44,9 +44,12 @@ def find_psd_peaks(data, fs, freq_range=None, averaging=False, plot=False,
         two elements, then the first and second elements are the lower and
         upper points of the frequency range to analyze. If `None`, then take
         the maximum of the PSD over the entire frequency range.
-    averaging : bool
+    averaging_range : list of 2 elements
         If `freq` argument is a list of two elements, then compute the PSD
-        return value by taking the average power between the endpoints.
+        return value by integrating the PSD in a frequency window given by
+        [fpeak + averaging_range[0], fpeak + averaging_range[1]]. If this
+        argument is set to `None` (default), then the PSD value returned is
+        simply the max of the PSD within freq_range.
     plot : bool
         Save plot of PSD with peak locations indicated.
     plot_filename : str
@@ -76,10 +79,9 @@ def find_psd_peaks(data, fs, freq_range=None, averaging=False, plot=False,
         indmax = np.argmax(psd[ind_freq_range])
         freq_peak = freq[ind_freq_range][indmax]
         psd_peak = psd[ind_freq_range][indmax]
-
-        if averaging:
-            freq_peak = freq_range
-            psd_peak = quad(finterp, psd_peak-0.4, psd_peak+0.4)
+        if averaging_range is not None:
+            psd_peak, _ = quad(finterp, freq_peak + averaging_range[0],
+                                        freq_peak + averaging_range[1])
     elif type(freq_range) is float:
         freq_peak = freq_range
         psd_peak = finterp(freq_range)
@@ -142,7 +144,7 @@ def analyze_psds(hk_filename, data_path=None, psd_plots=False,
             fmotor = motor_cal_func(hk_data[motor_value]['voltage'])
             freq_peak, psd_peak = find_psd_peaks(acc_name[:,jaxis], rate,
                                                  freq_range=[fmotor-2.0, fmotor+2.0],
-                                                 averaging=False,
+                                                 averaging_range=[-0.4, 0.4],
                                                  plot=psd_plots,
                                                  plot_filename='psd_peak_{}axis_{:.1f}.png'\
                                                                 .format(axes[jaxis], motor_value))
