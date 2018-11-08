@@ -4,6 +4,7 @@ from python_tb6612fng.TB6612FNG import TB6612FNG
 from python_mma8451.record_accelerometer import MMA8451DAQ
 import pickle
 from datetime import datetime
+import time
 
 P = ap.ArgumentParser(description='Perform frequency sweep to measure '
                       'mechanical transfer function.',
@@ -47,10 +48,11 @@ for motor_range in motor_ranges:
 
     # set motor controller range
     motor.set_pwm(motor_range)
+    time.sleep(1.0) # wait time after to allow time for equilibration
 
     # save housekeeping data
     daq = MMA8451DAQ('motor={:.1f}'.format(motor_range))
-    hkdata[motor_range] = {'voltage': voltage * (motor_range / 100.),
+    hkdata[motor_range] = {'voltage': args.voltage * (motor_range / 100.),
                            'file': daq.fname}
     with open(datetime.utcnow().strftime('%Y%m%d_%H%M%S_sweep_housekeeping.pkl'), 'w') as f:
         pickle.dump(hkdata, f)
